@@ -1,16 +1,14 @@
 package handlers
 
 import (
-	"context"
-	"github.com/gofiber/fiber/v2"
-	"github.com/go-playground/validator/v10"
-	"todo-api/database"
-	"todo-api/models"
+    "context"
+    "github.com/gofiber/fiber/v2"
+    "github.com/go-playground/validator/v10"
+    "todo-api/database"
+    "todo-api/models"
 )
 
 var validate = validator.New()
-
-
 
 // CreateTask godoc
 // @Summary Create a new task
@@ -18,34 +16,34 @@ var validate = validator.New()
 // @Tags tasks
 // @Accept  json
 // @Produce  json
-// @Param task body models.Task true "Task object"
+// @Param task body models.CreateTaskRequest true "Task object"
 // @Success 201 {object} models.Task
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /tasks [post]
 func CreateTask(c *fiber.Ctx) error {
-	task := new(models.Task)
-	if err := c.BodyParser(task); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
+    var req models.CreateTaskRequest
+    if err := c.BodyParser(&req); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	if err := validate.Struct(task); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
+    if err := validate.Struct(req); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	var id int
-	err := database.Pool.QueryRow(context.Background(),
-		"INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING id",
-		task.Title, task.Description,
-	).Scan(&id)
+    var task models.Task
+    err := database.Pool.QueryRow(context.Background(),
+        "INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING id, status",
+        req.Title, req.Description,
+    ).Scan(&task.ID, &task.Status)
 
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	task.ID = id
-	task.Status = "new"
-	return c.Status(fiber.StatusCreated).JSON(task)
+    task.Title = req.Title
+    task.Description = req.Description
+    return c.Status(fiber.StatusCreated).JSON(task)
 }
 
 
@@ -86,38 +84,41 @@ func GetTasks(c *fiber.Ctx) error {
 // @Accept  json
 // @Produce  json
 // @Param id path int true "Task ID"
-// @Param task body models.Task true "Task object"
+// @Param task body models.UpdateTaskRequest true "Task object"
 // @Success 204
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /tasks/{id} [put]
 func UpdateTask(c *fiber.Ctx) error {
-	id := c.Params("id")
-	task := new(models.Task)
-	if err := c.BodyParser(task); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
+    id := c.Params("id")
+    var req models.UpdateTaskRequest
+    if err := c.BodyParser(&req); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	if err := validate.Struct(task); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
+    if err := validate.Struct(req); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	commandTag, err := database.Pool.Exec(context.Background(),
-		`UPDATE tasks 
-		SET title = $1, description = $2, status = $3, updated_at = NOW() 
-		WHERE id = $4`,
-		task.Title, task.Description, task.Status, id)
+    commandTag, err := database.Pool.Exec(context.Background(),
+        `UPDATE tasks 
+        SET title = COALESCE($1, title), 
+            description = COALESCE($2, description), 
+            status = COALESCE($3, status), 
+            updated_at = NOW() 
+        WHERE id = $4`,
+        req.Title, req.Description, req.Status, id)
 
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-	}
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	if commandTag.RowsAffected() == 0 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Task not found"})
-	}
+    if commandTag.RowsAffected() == 0 {
+        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Task not found"})
+    }
 
-	return c.SendStatus(fiber.StatusNoContent)
+    return c.SendStatus(fiber.StatusNoContent)
 }
 
 

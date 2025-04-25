@@ -1,5 +1,16 @@
 basePath: /
 definitions:
+  models.CreateTaskRequest:
+    properties:
+      description:
+        example: Milk, eggs, bread
+        type: string
+      title:
+        example: Buy groceries
+        type: string
+    required:
+    - title
+    type: object
   models.Task:
     properties:
       description:
@@ -10,6 +21,22 @@ definitions:
         type: integer
       status:
         example: new
+        type: string
+      title:
+        example: Buy groceries
+        type: string
+    type: object
+  models.UpdateTaskRequest:
+    properties:
+      description:
+        example: Milk, eggs, bread
+        type: string
+      status:
+        enum:
+        - new
+        - in_progress
+        - done
+        example: in_progress
         type: string
       title:
         example: Buy groceries
@@ -62,7 +89,7 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/models.Task'
+          $ref: '#/definitions/models.CreateTaskRequest'
       produces:
       - application/json
       responses:
@@ -131,7 +158,7 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/models.Task'
+          $ref: '#/definitions/models.UpdateTaskRequest'
       produces:
       - application/json
       responses:

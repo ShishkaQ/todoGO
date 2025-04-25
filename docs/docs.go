@@ -77,7 +77,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/models.CreateTaskRequest"
                         }
                     }
                 ],
@@ -136,7 +136,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/models.UpdateTaskRequest"
                         }
                     }
                 ],
@@ -221,6 +221,22 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.CreateTaskRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Milk, eggs, bread"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
+                }
+            }
+        },
         "models.Task": {
             "type": "object",
             "properties": {
@@ -235,6 +251,28 @@ const docTemplate = `{
                 "status": {
                     "type": "string",
                     "example": "new"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
+                }
+            }
+        },
+        "models.UpdateTaskRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Milk, eggs, bread"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "new",
+                        "in_progress",
+                        "done"
+                    ],
+                    "example": "in_progress"
                 },
                 "title": {
                     "type": "string",

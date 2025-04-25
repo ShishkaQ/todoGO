@@ -74,7 +74,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/models.CreateTaskRequest"
                         }
                     }
                 ],
@@ -133,7 +133,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/models.UpdateTaskRequest"
                         }
                     }
                 ],
@@ -218,6 +218,22 @@
         }
     },
     "definitions": {
+        "models.CreateTaskRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Milk, eggs, bread"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
+                }
+            }
+        },
         "models.Task": {
             "type": "object",
             "properties": {
@@ -232,6 +248,28 @@
                 "status": {
                     "type": "string",
                     "example": "new"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
+                }
+            }
+        },
+        "models.UpdateTaskRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Milk, eggs, bread"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "new",
+                        "in_progress",
+                        "done"
+                    ],
+                    "example": "in_progress"
                 },
                 "title": {
                     "type": "string",
