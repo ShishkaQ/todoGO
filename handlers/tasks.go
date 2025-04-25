@@ -10,6 +10,19 @@ import (
 
 var validate = validator.New()
 
+
+
+// CreateTask godoc
+// @Summary Create a new task
+// @Description Create a new task with the input payload
+// @Tags tasks
+// @Accept  json
+// @Produce  json
+// @Param task body models.Task true "Task object"
+// @Success 201 {object} models.Task
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /tasks [post]
 func CreateTask(c *fiber.Ctx) error {
 	task := new(models.Task)
 	if err := c.BodyParser(task); err != nil {
@@ -35,6 +48,16 @@ func CreateTask(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(task)
 }
 
+
+// GetTasks godoc
+// @Summary Get all tasks
+// @Description Get list of all tasks
+// @Tags tasks
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.Task
+// @Failure 500 {object} map[string]string
+// @Router /tasks [get]
 func GetTasks(c *fiber.Ctx) error {
 	rows, err := database.Pool.Query(context.Background(),
 		"SELECT id, title, description, status FROM tasks ORDER BY id")
@@ -55,6 +78,20 @@ func GetTasks(c *fiber.Ctx) error {
 	return c.JSON(tasks)
 }
 
+
+// UpdateTask godoc
+// @Summary Update a task
+// @Description Update existing task by ID
+// @Tags tasks
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Task ID"
+// @Param task body models.Task true "Task object"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /tasks/{id} [put]
 func UpdateTask(c *fiber.Ctx) error {
 	id := c.Params("id")
 	task := new(models.Task)
@@ -83,6 +120,18 @@ func UpdateTask(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
+
+// DeleteTask godoc
+// @Summary Delete a task
+// @Description Delete existing task by ID
+// @Tags tasks
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Task ID"
+// @Success 204
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /tasks/{id} [delete]
 func DeleteTask(c *fiber.Ctx) error {
 	id := c.Params("id")
 
