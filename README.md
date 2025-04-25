@@ -16,7 +16,7 @@
 cd docker
 ```
 
-2. Запустите Docker контейнера с PostgreSQL
+2. Запустите Docker контейнер с PostgreSQL
 ```bash
 sudo docker-compose up -d
 ```
