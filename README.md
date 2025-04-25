@@ -4,7 +4,7 @@
 
 ### Список реализованных фич
 - REST API на Fiber
-- База дынныз PostgreSQL на Docker
+- База данных PostgreSQL в Docker контейнере
 - Swager документация
 - CRUD-операции для задач
 
@@ -16,7 +16,7 @@
 cd docker
 ```
 
-2. Запуск Docker контейнера с Redis
+2. Запустите Docker контейнера с PostgreSQL
 ```bash
 sudo docker-compose up -d
 ```
@@ -31,7 +31,7 @@ cd ../
 go mod tidy
 ```
 
-4. Запуст HTTP API
+4. Запустите HTTP API
 ```bash
 go run main.go
 ```
