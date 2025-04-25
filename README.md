@@ -39,3 +39,9 @@ go run main.go
 
 ### Документация: http://localhost:3000/swagger/index.html
 ![](README_media/item1.png)
+
+### Создание нового таска
+![](README_media/item2.png)
+
+### Новый таск в базе данных
+![](README_media/item3.png)
